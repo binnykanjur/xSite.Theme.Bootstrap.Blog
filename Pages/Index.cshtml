@@ -1,0 +1,66 @@
+﻿@page
+@using xSite
+@model PaginatedModel<PostInfo>
+@inject ISiteManager _siteManager
+
+@{
+    var siteInfo = await _siteManager.GetSiteInfoAsync();
+    ViewData["Title"] = siteInfo.Title;
+    ViewData["Description"] = siteInfo.Description;
+    ViewData["Author"] = siteInfo.Author;
+    ViewData["SiteInfo"] = siteInfo;
+}
+
+<!-- Blog Entries Column -->
+<div class="col-md-8">
+
+    <h1 class="my-4">
+        Posts
+        @*<small>Secondary Text</small>*@
+    </h1>
+
+    <!-- Blog Post -->
+    @foreach (var post in Model.Items) {
+        var postUrl = _siteManager.GetUrl(post);
+        <div class="card mb-4">
+
+            @if (post.FeaturedMedia != null) {
+                var mediaUrl = post.FeaturedMedia.LibraryFilePath;
+                var mediaAltText = post.FeaturedMedia.AltText;
+                <img class="card-img-top" src="@mediaUrl" alt="@mediaAltText">
+            }
+
+            <div class="card-body">
+                <h2 class="card-title">@post.Title</h2>
+                <p class="card-text">@post.Excerpt</p>
+                <a href="@postUrl" class="btn btn-primary">Read More &rarr;</a>
+            </div>
+            <div class="card-footer text-muted">
+                @post.PublishedOn.Value.ToString("MMMM d, yyyy") by
+                <a href="#">@post.Author.Name</a>
+            </div>
+        </div>
+    }
+
+    <!-- Pagination -->
+    <ul class="pagination justify-content-center mb-4">
+        @{
+            var styles = "page-item";
+            if (!Model.ShowPrevious) {
+                styles = "page-item disabled";
+            }
+            <li class="@styles">
+                <a class="page-link" href="@Model.GetPreviousPageUrl()">&larr; Older</a>
+            </li>
+
+            if (Model.ShowNext) {
+                styles = "page-item";
+            } else {
+                styles = "page-item disabled";
+            }
+            <li class="@styles">
+                <a class="page-link" href="@Model.GetNextPageUrl()">Newer &rarr;</a>
+            </li>
+        }
+    </ul>
+</div>

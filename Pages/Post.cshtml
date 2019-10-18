@@ -1,0 +1,46 @@
+﻿@page
+@using xSite
+@model xSiteModel<Post>
+@inject ISiteManager _siteManager
+
+@{
+    var siteInfo = await _siteManager.GetSiteInfoAsync();
+    ViewData["Title"] = Model.Item.Title + " - " + siteInfo.Title;
+    ViewData["Description"] = Model.Item.Excerpt;
+    ViewData["Author"] = Model.Item.Author.Name;
+    ViewData["SiteInfo"] = siteInfo;
+}
+
+<!-- Post Content Column -->
+<div class="col-lg-8">
+
+    <!-- Title -->
+    <h1 class="mt-4">@Model.Item.Title</h1>
+
+    <!-- Author -->
+    <p class="lead">
+        by
+        <a href="#">@Model.Item.Author.Name</a>
+    </p>
+
+    <hr>
+
+    <!-- Date/Time -->
+    <p>@Model.Item.PublishedOn.Value.ToString("MMMM d, yyyy")</p>
+
+    <hr>
+
+    <!-- Preview Image -->
+    @if (@Model.Item.FeaturedMedia != null) {
+        var mediaUrl = Model.Item.FeaturedMedia.LibraryFilePath;
+        var mediaAltText = Model.Item.FeaturedMedia.AltText;
+        <img class="img-fluid rounded" src="@mediaUrl" alt="@mediaAltText">
+
+        <hr>
+    }
+
+    <!-- Post Content -->
+    <p class="lead">
+        @Html.Raw(@Model.Item.Body)
+    </p>
+</div>
